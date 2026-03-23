@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import { Course, Module, Lesson } from '@/types/database'
 import Navbar from '@/components/layout/Navbar'
+import ImageUpload from '@/components/ui/ImageUpload'
 
 type ModuleWithLessons = Module & { lessons: Lesson[] }
 
@@ -187,7 +188,7 @@ export default function CourseEditorPage({ params }: { params: { id: string } })
             {[
               { field: 'title', label: 'Título *', full: true },
               { field: 'instructor_name', label: 'Instructor', full: false },
-              { field: 'image_url', label: 'URL de imagen', full: false },
+              
             ].map(({ field, label, full }) => (
               <div key={field} className={full ? 'md:col-span-2' : ''}>
                 <label className="block text-xs font-display font-semibold text-on-surface-variant uppercase tracking-wider mb-1.5">{label}</label>

@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import { Course } from '@/types/database'
 import Navbar from '@/components/layout/Navbar'
+import ImageUpload from '@/components/ui/ImageUpload'
 
 export default function AdminPage() {
   const router = useRouter()
@@ -194,8 +195,7 @@ export default function AdminPage() {
               {[
                 { field: 'title', label: 'Título del curso *', placeholder: 'Ej: Gestión de pedidos con Alma Orders' },
                 { field: 'instructor_name', label: 'Instructor', placeholder: 'Nombre del instructor' },
-                { field: 'image_url', label: 'URL de imagen', placeholder: 'https://...' },
-              ].map(({ field, label, placeholder }) => (
+                      ].map(({ field, label, placeholder }) => (
                 <div key={field}>
                   <label className="block text-xs font-display font-semibold text-on-surface-variant uppercase tracking-wider mb-1.5">{label}</label>
                   <input
@@ -207,6 +207,11 @@ export default function AdminPage() {
                   />
                 </div>
               ))}
+              <ImageUpload
+                label="Imagen del curso"
+                value={newCourse.image_url}
+                onChange={url => setNewCourse(prev => ({ ...prev, image_url: url }))}
+              />
               <div>
                 <label className="block text-xs font-display font-semibold text-on-surface-variant uppercase tracking-wider mb-1.5">Descripción</label>
                 <textarea
