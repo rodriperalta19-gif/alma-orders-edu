@@ -29,60 +29,75 @@ export default function Navbar() {
   const isAdmin = profile?.role === 'admin'
 
   return (
-    <nav className="glass-nav sticky top-0 z-50 border-b border-outline-variant/20">
+    <nav className="glass-nav sticky top-0 z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-        <Link href="/catalog" className="flex items-center gap-2">
-          <img src="/logo.png" alt="Alma Orders" className="h-9 w-auto object-contain" />
-          <div className="leading-tight hidden sm:block">
-            <span className="font-display font-bold text-sm text-on-surface block">Alma Orders</span>
-            <span className="font-body text-[10px] text-on-surface-variant -mt-0.5 block">Centro de Formación</span>
-          </div>
+        {/* Logo */}
+        <Link href="/catalog" className="flex items-center gap-2.5">
+          <img src="/logo.png" alt="Alma Orders" className="h-10 w-auto object-contain" />
         </Link>
 
-        <div className="hidden md:flex items-center gap-6">
-          <Link href="/catalog" className={`font-body text-sm transition-colors ${pathname === '/catalog' ? 'text-primary font-semibold' : 'text-on-surface-variant hover:text-on-surface'}`}>
+        {/* Nav Links */}
+        <div className="hidden md:flex items-center gap-1">
+          <Link href="/catalog" className={`px-4 py-2 rounded-xl font-body text-sm font-medium transition-all ${
+            pathname === '/catalog'
+              ? 'bg-primary/10 text-primary font-semibold'
+              : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface'
+          }`}>
             Cursos
           </Link>
           {isAdmin && (
-            <Link href="/admin" className={`font-body text-sm transition-colors ${pathname.startsWith('/admin') ? 'text-primary font-semibold' : 'text-on-surface-variant hover:text-on-surface'}`}>
+            <Link href="/admin" className={`px-4 py-2 rounded-xl font-body text-sm font-medium transition-all ${
+              pathname.startsWith('/admin')
+                ? 'bg-primary/10 text-primary font-semibold'
+                : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface'
+            }`}>
               Administrar
             </Link>
           )}
         </div>
 
+        {/* User Menu */}
         <div className="relative">
-          <button onClick={() => setMenuOpen(!menuOpen)} className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-surface-container-high transition-colors">
-            <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-display font-bold text-white flex-shrink-0" style={{background: 'linear-gradient(135deg, #00450d 0%, #065f18 100%)'}}>
+          <button onClick={() => setMenuOpen(!menuOpen)}
+            className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-surface-container-high transition-all">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-display font-bold text-white flex-shrink-0"
+              style={{background: 'linear-gradient(135deg, #00C853 0%, #009624 100%)'}}>
               {profile?.full_name?.charAt(0).toUpperCase() || '?'}
             </div>
-            <span className="hidden md:block font-body text-sm text-on-surface max-w-[120px] truncate">{profile?.full_name || 'Usuario'}</span>
-            <span className="material-symbols-outlined text-base text-on-surface-variant">expand_more</span>
+            <div className="hidden md:block text-left">
+              <p className="font-body text-xs font-semibold text-on-surface leading-tight max-w-[110px] truncate">{profile?.full_name || 'Usuario'}</p>
+              {isAdmin && <p className="font-body text-[10px] text-primary leading-tight">Admin</p>}
+            </div>
+            <span className="material-symbols-outlined text-sm text-on-surface-variant">expand_more</span>
           </button>
 
           {menuOpen && (
             <>
               <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
-              <div className="absolute right-0 mt-2 w-52 bg-surface-container-lowest rounded-xl modal-shadow py-2 z-50">
-                <div className="px-4 py-2 border-b border-surface-container-high mb-1">
-                  <p className="font-body text-xs text-on-surface font-medium truncate">{profile?.full_name}</p>
-                  {isAdmin && (
-                    <span className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-display font-semibold">
-                      Admin
-                    </span>
-                  )}
+              <div className="absolute right-0 mt-2 w-56 bg-surface-container-lowest rounded-2xl modal-shadow py-2 z-50 border border-outline-variant/20">
+                <div className="px-4 py-3 border-b border-surface-container-high">
+                  <p className="font-display font-semibold text-sm text-on-surface truncate">{profile?.full_name}</p>
+                  <span className={`inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-full text-[10px] font-display font-bold ${
+                    isAdmin ? 'bg-primary/15 text-primary-dark' : 'bg-surface-container text-on-surface-variant'
+                  }`}>
+                    {isAdmin ? '⚡ Admin' : '👤 Estudiante'}
+                  </span>
                 </div>
                 {isAdmin && (
-                  <Link href="/admin" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface-container-low transition-colors">
-                    <span className="material-symbols-outlined text-base text-on-surface-variant">admin_panel_settings</span>
+                  <Link href="/admin" onClick={() => setMenuOpen(false)}
+                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface-container-low transition-colors">
+                    <span className="material-symbols-outlined text-base text-primary">admin_panel_settings</span>
                     <span className="font-body text-sm text-on-surface">Panel Admin</span>
                   </Link>
                 )}
-                <Link href="/catalog" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface-container-low transition-colors">
+                <Link href="/catalog" onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface-container-low transition-colors">
                   <span className="material-symbols-outlined text-base text-on-surface-variant">school</span>
                   <span className="font-body text-sm text-on-surface">Mis Cursos</span>
                 </Link>
-                <div className="my-1 h-px bg-surface-container-high mx-4" />
-                <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-surface-container-low transition-colors">
+                <div className="my-1 mx-4 h-px bg-surface-container-high" />
+                <button onClick={handleLogout}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-surface-container-low transition-colors">
                   <span className="material-symbols-outlined text-base text-on-surface-variant">logout</span>
                   <span className="font-body text-sm text-on-surface">Cerrar sesión</span>
                 </button>
