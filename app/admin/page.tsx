@@ -114,6 +114,16 @@ export default function AdminPage() {
           ))}
         </div>
 
+        {/* Quick Links */}
+        <div className="flex gap-3 mb-8">
+          <Link href="/admin/students">
+            <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-surface-container-lowest border border-outline-variant/20 hover:border-primary/30 text-on-surface text-sm font-display font-semibold transition-all hover:shadow-sm">
+              <span className="material-symbols-outlined text-base text-primary">people</span>
+              Ver alumnos
+            </button>
+          </Link>
+        </div>
+
         {/* Course List */}
         <div>
           <h2 className="font-display font-bold text-xl text-on-surface mb-5">Gestión de cursos</h2>
