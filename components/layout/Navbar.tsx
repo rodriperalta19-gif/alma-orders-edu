@@ -90,6 +90,11 @@ export default function Navbar() {
                     <span className="font-body text-sm text-on-surface">Panel Admin</span>
                   </Link>
                 )}
+                <Link href="/profile" onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface-container-low transition-colors">
+                  <span className="material-symbols-outlined text-base text-on-surface-variant">person</span>
+                  <span className="font-body text-sm text-on-surface">Mi Perfil</span>
+                </Link>
                 <Link href="/catalog" onClick={() => setMenuOpen(false)}
                   className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface-container-low transition-colors">
                   <span className="material-symbols-outlined text-base text-on-surface-variant">school</span>
