@@ -60,9 +60,15 @@ export default function Navbar() {
         <div className="relative">
           <button onClick={() => setMenuOpen(!menuOpen)}
             className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-surface-container-high transition-all">
-            <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-display font-bold text-white flex-shrink-0"
-              style={{background: 'linear-gradient(135deg, #00C853 0%, #009624 100%)'}}>
-              {profile?.full_name?.charAt(0).toUpperCase() || '?'}
+            <div className="w-8 h-8 rounded-full flex-shrink-0 overflow-hidden">
+              {profile?.avatar_url ? (
+                <img src={profile.avatar_url} alt={profile.full_name} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-sm font-display font-bold text-white"
+                  style={{background: 'linear-gradient(135deg, #00C853 0%, #009624 100%)'}}>
+                  {profile?.full_name?.charAt(0).toUpperCase() || '?'}
+                </div>
+              )}
             </div>
             <div className="hidden md:block text-left">
               <p className="font-body text-xs font-semibold text-on-surface leading-tight max-w-[110px] truncate">{profile?.full_name || 'Usuario'}</p>

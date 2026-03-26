@@ -44,7 +44,7 @@ export default function AuthPage() {
           <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-primary/15 blur-3xl" />
         </div>
         <div className="relative z-10 text-center max-w-md">
-          <img src="/logo.png" alt="Alma Orders" className="h-24 w-auto object-contain mx-auto mb-8" style={{filter:'brightness(0) invert(1)'}} />
+          <img src="/logo-dark.png" alt="Alma Orders" className="h-24 w-auto object-contain mx-auto mb-8" />
           <h1 className="font-display font-bold text-4xl text-white leading-tight mb-4">
             Academia<br/>
             <span style={{color:'#00C853'}}>Alma Orders</span>

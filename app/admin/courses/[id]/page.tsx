@@ -25,7 +25,7 @@ export default function CourseEditorPage({ params }: { params: { id: string } })
   const [modModal, setModModal] = useState<{ open: boolean; editing: Module | null }>({ open: false, editing: null })
   const [lessonModal, setLessonModal] = useState<{ open: boolean; editing: Lesson | null; moduleId: string }>({ open: false, editing: null, moduleId: '' })
   const [modForm, setModForm] = useState({ title: '', order_index: 0 })
-  const [lessonForm, setLessonForm] = useState({ title: '', video_url: '', duration: '', order_index: 0 })
+  const [lessonForm, setLessonForm] = useState({ title: '', video_url: '', duration: '', order_index: 0, description: '' })
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }: { data: { session: any } }) => {
@@ -106,7 +106,7 @@ export default function CourseEditorPage({ params }: { params: { id: string } })
     setLessonModal({ open: true, editing: null, moduleId })
   }
   const openEditLesson = (lesson: Lesson, moduleId: string) => {
-    setLessonForm({ title: lesson.title, video_url: lesson.video_url || '', duration: lesson.duration?.toString() || '', order_index: lesson.order_index })
+    setLessonForm({ title: lesson.title, video_url: lesson.video_url || '', duration: lesson.duration?.toString() || '', order_index: lesson.order_index, description: lesson.description || '' })
     setLessonModal({ open: true, editing: lesson, moduleId })
   }
   const saveLesson = async () => {
@@ -115,7 +115,8 @@ export default function CourseEditorPage({ params }: { params: { id: string } })
       title: lessonForm.title,
       video_url: lessonForm.video_url || null,
       duration: lessonForm.duration ? parseInt(lessonForm.duration) : null,
-      order_index: lessonForm.order_index
+      order_index: lessonForm.order_index,
+      description: lessonForm.description || null
     }
     if (lessonModal.editing) {
       const { data } = await supabase.from('lessons').update(payload).eq('id', lessonModal.editing.id).select().single()
@@ -317,6 +318,16 @@ export default function CourseEditorPage({ params }: { params: { id: string } })
                 />
               </div>
             </div>
+              <div>
+                <label className="block text-xs font-display font-semibold text-on-surface-variant uppercase tracking-wider mb-1.5">Descripción de la lección</label>
+                <textarea
+                  value={lessonForm.description}
+                  onChange={e => setLessonForm(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="Descripción breve de lo que aprenderán en esta clase..."
+                  rows={3}
+                  className="w-full bg-surface-container px-4 py-2.5 rounded-xl text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all resize-none"
+                />
+              </div>
             <div className="flex gap-3 mt-5">
               <button onClick={() => setModModal({ open: false, editing: null })} className="flex-1 py-2.5 rounded-xl bg-surface-container-high text-on-surface text-sm font-body hover:bg-surface-container transition-colors">
                 Cancelar
@@ -381,6 +392,16 @@ export default function CourseEditorPage({ params }: { params: { id: string } })
                 </div>
               </div>
             </div>
+              <div>
+                <label className="block text-xs font-display font-semibold text-on-surface-variant uppercase tracking-wider mb-1.5">Descripción de la lección</label>
+                <textarea
+                  value={lessonForm.description}
+                  onChange={e => setLessonForm(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="Descripción breve de lo que aprenderán en esta clase..."
+                  rows={3}
+                  className="w-full bg-surface-container px-4 py-2.5 rounded-xl text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all resize-none"
+                />
+              </div>
             <div className="flex gap-3 mt-5">
               <button onClick={() => setLessonModal({ open: false, editing: null, moduleId: '' })} className="flex-1 py-2.5 rounded-xl bg-surface-container-high text-on-surface text-sm font-body hover:bg-surface-container transition-colors">
                 Cancelar

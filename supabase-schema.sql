@@ -131,3 +131,43 @@ create policy "Own progress update" on public.user_progress for update using (au
 -- update public.profiles set role = 'admin' where id = (
 --   select id from auth.users where email = 'tu@email.com'
 -- );
+
+-- ============================================================
+-- NUEVAS TABLAS: Ratings y Comentarios por lección
+-- ============================================================
+
+-- Ratings (1-5 estrellas por lección)
+create table if not exists public.lesson_ratings (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users(id) on delete cascade not null,
+  lesson_id uuid references public.lessons(id) on delete cascade not null,
+  rating int not null check (rating >= 1 and rating <= 5),
+  created_at timestamptz default now(),
+  unique(user_id, lesson_id)
+);
+
+-- Comentarios por lección
+create table if not exists public.lesson_comments (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users(id) on delete cascade not null,
+  lesson_id uuid references public.lessons(id) on delete cascade not null,
+  comment text not null,
+  created_at timestamptz default now()
+);
+
+-- Descripción en lecciones (agregar columna si no existe)
+alter table public.lessons add column if not exists description text;
+
+-- RLS
+alter table public.lesson_ratings enable row level security;
+alter table public.lesson_comments enable row level security;
+
+create policy "Auth read ratings" on public.lesson_ratings for select using (auth.role() = 'authenticated');
+create policy "Own rating insert" on public.lesson_ratings for insert with check (auth.uid() = user_id);
+create policy "Own rating update" on public.lesson_ratings for update using (auth.uid() = user_id);
+
+create policy "Auth read comments" on public.lesson_comments for select using (auth.role() = 'authenticated');
+create policy "Own comment insert" on public.lesson_comments for insert with check (auth.uid() = user_id);
+create policy "Admin delete comments" on public.lesson_comments for delete using (
+  exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
+);
