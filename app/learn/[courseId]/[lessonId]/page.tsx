@@ -59,7 +59,7 @@ export default function LearnPage({ params }) {
     const [{ data: ratingsData }, { data: myRating }, { data: commentsData }] = await Promise.all([
       supabase.from('lesson_ratings').select('rating').eq('lesson_id', lessonId),
       supabase.from('lesson_ratings').select('rating').eq('lesson_id', lessonId).eq('user_id', uid).single(),
-      supabase.from('lesson_comments').select('*, profiles(full_name, avatar_url)').eq('lesson_id', lessonId).order('created_at', { ascending: false })
+      supabase.from('lesson_comments').select('*').eq('lesson_id', lessonId).order('created_at', { ascending: false })
     ])
     if (ratingsData && ratingsData.length > 0) {
       const avg = ratingsData.reduce((a, r) => a + r.rating, 0) / ratingsData.length
@@ -269,11 +269,11 @@ export default function LearnPage({ params }) {
                   ) : comments.map(c => (
                     <div key={c.id} className="flex gap-3">
                       <div className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold text-white" style={{background:'linear-gradient(135deg,#00C853,#009624)'}}>
-                        {c.profiles?.full_name?.charAt(0).toUpperCase() || '?'}
+                        U
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-0.5">
-                          <span className="font-display font-semibold text-xs text-white">{c.profiles?.full_name || 'Usuario'}</span>
+                          <span className="font-display font-semibold text-xs text-white">Usuario</span>
                           <span className="font-body text-xs text-white/30">{new Date(c.created_at).toLocaleDateString('es-AR')}</span>
                         </div>
                         <p className="font-body text-sm text-white/70 leading-relaxed">{c.comment}</p>
