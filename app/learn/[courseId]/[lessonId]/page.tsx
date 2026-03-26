@@ -42,19 +42,15 @@ export default function LearnPage({ params }) {
       supabase.from('lessons').select('*, modules!inner(course_id)').eq('modules.course_id', params.courseId).order('order_index'),
       supabase.from('user_progress').select('lesson_id, is_completed').eq('user_id', uid)
     ])
-
     if (!courseData || !lessonData) { router.replace('/catalog'); return }
-
     setCourse(courseData)
     setCurrentLesson(lessonData)
-
     if (modulesData && allLessons) {
       setModules(modulesData.map(m => ({ ...m, lessons: allLessons.filter(l => l.module_id === m.id) })))
     }
     if (progressData) {
       setCompletedLessons(new Set(progressData.filter(p => p.is_completed).map(p => p.lesson_id)))
     }
-
     setLoading(false)
     fetchRatingsAndComments(lessonData.id, uid)
   }
@@ -63,9 +59,8 @@ export default function LearnPage({ params }) {
     const [{ data: ratingsData }, { data: myRating }, { data: commentsData }] = await Promise.all([
       supabase.from('lesson_ratings').select('rating').eq('lesson_id', lessonId),
       supabase.from('lesson_ratings').select('rating').eq('lesson_id', lessonId).eq('user_id', uid).single(),
-      supabase.from('lesson_comments').select('*, profiles!user_id(full_name, avatar_url)').eq('lesson_id', lessonId).order('created_at', { ascending: false })
+      supabase.from('lesson_comments').select('*').eq('lesson_id', lessonId).order('created_at', { ascending: false })
     ])
-
     if (ratingsData && ratingsData.length > 0) {
       const avg = ratingsData.reduce((a, r) => a + r.rating, 0) / ratingsData.length
       setAvgRating(Math.round(avg * 10) / 10)
@@ -95,7 +90,19 @@ export default function LearnPage({ params }) {
   const submitComment = async () => {
     if (!comment.trim() || !userId || savingComment) return
     setSavingComment(true)
-    await supabase.from('lesson_comments').insert({ user_id: userId, lesson_id: currentLesson.id, comment: comment.trim() })
+    // Obtenemos el nombre del usuario y lo guardamos en el comentario
+const { data: prof } = await supabase
+  .from('profiles')
+  .select('full_name')
+  .eq('id', userId)
+  .single()
+
+await supabase.from('lesson_comments').insert({ 
+  user_id: userId, 
+  lesson_id: currentLesson.id, 
+  comment: comment.trim(), 
+  full_name: prof?.full_name || 'Usuario' 
+})
     setComment('')
     fetchRatingsAndComments(currentLesson.id, userId)
     setSavingComment(false)
@@ -105,7 +112,6 @@ export default function LearnPage({ params }) {
   const currentIdx = allLessons.findIndex(l => l.id === params.lessonId)
   const nextLesson = currentIdx < allLessons.length - 1 ? allLessons[currentIdx + 1] : null
   const prevLesson = currentIdx > 0 ? allLessons[currentIdx - 1] : null
-
   const doneCount = [...completedLessons].filter(id => allLessons.some(l => l.id === id)).length
   const pct = allLessons.length > 0 ? Math.round((doneCount / allLessons.length) * 100) : 0
   const isCompleted = currentLesson ? completedLessons.has(currentLesson.id) : false
@@ -274,15 +280,14 @@ export default function LearnPage({ params }) {
                     <p className="font-body text-sm text-white/30 text-center py-4">Sé el primero en comentar.</p>
                   ) : comments.map(c => (
                     <div key={c.id} className="flex gap-3">
-                      {/* ←←← AQUÍ ESTÁ EL CAMBIO */}
-                      <div className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold text-white" 
+                      <div className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold text-white"
                            style={{background:'linear-gradient(135deg,#00C853,#009624)'}}>
-                        {c.profiles?.full_name?.charAt(0).toUpperCase() || 'U'}
+                        {c.full_name?.charAt(0).toUpperCase() || 'U'}
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-0.5">
                           <span className="font-display font-semibold text-xs text-white">
-                            {c.profiles?.full_name || 'Usuario'}
+                            {c.full_name || 'Usuario'}
                           </span>
                           <span className="font-body text-xs text-white/30">
                             {new Date(c.created_at).toLocaleDateString('es-AR')}
