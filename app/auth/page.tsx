@@ -2,7 +2,7 @@
 'use client'
 export const runtime = 'edge'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 
 export default function AuthPage() {
@@ -15,6 +15,8 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const searchParams = useSearchParams()
+  const ssoError = searchParams.get('error')
 
   const handleLogin = async () => {
     setLoading(true); setError('')
@@ -44,7 +46,7 @@ export default function AuthPage() {
           <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-primary/15 blur-3xl" />
         </div>
         <div className="relative z-10 text-center max-w-md">
-          <img src="/logo-dark.png" alt="Alma Orders" className="h-24 w-24 object-contain mx-auto mb-8 rounded-full" />
+          <img src="/logo-dark.png" alt="Alma Orders" className="h-24 w-auto object-contain mx-auto mb-8" />
           <h1 className="font-display font-bold text-4xl text-white leading-tight mb-4">
             Academia<br/>
             <span style={{color:'#00C853'}}>Alma Orders</span>
@@ -75,6 +77,12 @@ export default function AuthPage() {
             {mode === 'login' ? 'Continuá aprendiendo donde lo dejaste.' : 'Empezá a crecer con Alma Orders.'}
           </p>
 
+          {/* SSO Error */}
+          {ssoError && (
+            <div className="mb-5 px-4 py-3 bg-error-container rounded-xl text-on-error-container text-sm text-center">
+              {ssoError === 'missing_token' ? 'Token de acceso faltante. Intentá ingresar desde Alma Orders nuevamente.' : 'El link de acceso automático no es válido o expiró. Iniciá sesión manualmente.'}
+            </div>
+          )}
           {/* Tabs */}
           <div className="flex gap-1 bg-surface-container-low rounded-xl p-1 mb-6">
             {[['login','Iniciar sesión'],['register','Registrarse']].map(([m, label]) => (

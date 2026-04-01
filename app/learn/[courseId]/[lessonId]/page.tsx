@@ -90,19 +90,7 @@ export default function LearnPage({ params }) {
   const submitComment = async () => {
     if (!comment.trim() || !userId || savingComment) return
     setSavingComment(true)
-    // Obtenemos el nombre del usuario y lo guardamos en el comentario
-const { data: prof } = await supabase
-  .from('profiles')
-  .select('full_name')
-  .eq('id', userId)
-  .single()
-
-await supabase.from('lesson_comments').insert({ 
-  user_id: userId, 
-  lesson_id: currentLesson.id, 
-  comment: comment.trim(), 
-  full_name: prof?.full_name || 'Usuario' 
-})
+    await supabase.from('lesson_comments').insert({ user_id: userId, lesson_id: currentLesson.id, comment: comment.trim() })
     setComment('')
     fetchRatingsAndComments(currentLesson.id, userId)
     setSavingComment(false)
@@ -258,7 +246,7 @@ await supabase.from('lesson_comments').insert({
               {/* Comments */}
               <div className="bg-white/5 rounded-xl p-5">
                 <p className="font-display font-semibold text-white text-sm mb-4">Comentarios ({comments.length})</p>
-               
+                
                 {/* New comment input */}
                 <div className="flex gap-3 mb-5">
                   <textarea
@@ -280,18 +268,13 @@ await supabase.from('lesson_comments').insert({
                     <p className="font-body text-sm text-white/30 text-center py-4">Sé el primero en comentar.</p>
                   ) : comments.map(c => (
                     <div key={c.id} className="flex gap-3">
-                      <div className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold text-white"
-                           style={{background:'linear-gradient(135deg,#00C853,#009624)'}}>
-                        {c.full_name?.charAt(0).toUpperCase() || 'U'}
+                      <div className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold text-white" style={{background:'linear-gradient(135deg,#00C853,#009624)'}}>
+                        U
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-0.5">
-                          <span className="font-display font-semibold text-xs text-white">
-                            {c.full_name || 'Usuario'}
-                          </span>
-                          <span className="font-body text-xs text-white/30">
-                            {new Date(c.created_at).toLocaleDateString('es-AR')}
-                          </span>
+                          <span className="font-display font-semibold text-xs text-white">Usuario</span>
+                          <span className="font-body text-xs text-white/30">{new Date(c.created_at).toLocaleDateString('es-AR')}</span>
                         </div>
                         <p className="font-body text-sm text-white/70 leading-relaxed">{c.comment}</p>
                       </div>
