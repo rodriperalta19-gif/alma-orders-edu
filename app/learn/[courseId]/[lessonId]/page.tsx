@@ -13,11 +13,15 @@ export default function LearnPage({ params }) {
   const [modules, setModules] = useState([])
   const [currentLesson, setCurrentLesson] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
     fetchData()
   }, [params.courseId, params.lessonId])
+
+  useEffect(() => {
+    setSidebarOpen(false)
+  }, [params.lessonId])
 
   const fetchData = async () => {
     const [{ data: courseData }, { data: modulesData }, { data: lessonData }, { data: allLessons }] = await Promise.all([
@@ -71,20 +75,30 @@ export default function LearnPage({ params }) {
             <p className="font-display font-semibold text-white text-sm truncate">{course?.title}</p>
             <p className="font-body text-xs text-white/50 truncate">{currentLesson?.title}</p>
           </div>
-          <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors">
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="p-2 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors"
+          >
             <span className="material-symbols-outlined text-base">menu</span>
           </button>
         </div>
       </div>
 
       {/* Main */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Video + Content */}
-        <div className="flex-1 flex flex-col overflow-y-auto">
+      <div className="flex flex-1 overflow-hidden relative">
+
+        <div className="flex-1 flex flex-col overflow-y-auto min-w-0">
           {/* Video */}
-          <div className="bg-black relative" style={{paddingTop:'56.25%'}}>
+          <div className="bg-black relative" style={{ paddingTop: '56.25%' }}>
             {embedUrl ? (
-              <iframe src={embedUrl} className="absolute inset-0 w-full h-full" frameBorder="0" allow="autoplay; fullscreen; picture-in-picture" allowFullScreen title={currentLesson?.title} />
+              <iframe
+                src={embedUrl}
+                className="absolute inset-0 w-full h-full"
+                frameBorder="0"
+                allow="autoplay; fullscreen; picture-in-picture"
+                allowFullScreen
+                title={currentLesson?.title}
+              />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center">
                 <span className="material-symbols-outlined text-6xl text-white/20">videocam_off</span>
@@ -107,7 +121,6 @@ export default function LearnPage({ params }) {
                 </div>
               </div>
 
-              {/* Description */}
               {currentLesson?.description && (
                 <div className="bg-white/5 rounded-xl p-4 mb-5">
                   <p className="font-body text-sm text-white/70 leading-relaxed">{currentLesson.description}</p>
@@ -144,38 +157,64 @@ export default function LearnPage({ params }) {
           </div>
         </div>
 
-        {/* Sidebar */}
+        {/* Mobile backdrop */}
         {sidebarOpen && (
-          <div className="w-80 flex-shrink-0 bg-[#141414] flex flex-col overflow-y-auto border-l border-white/10">
-            <div className="p-4 border-b border-white/10">
-              <p className="font-display font-semibold text-white text-sm">Contenido del curso</p>
-            </div>
-            {modules.map((mod, modIdx) => (
-              <div key={mod.id}>
-                <div className="px-4 py-3 bg-white/5">
-                  <p className="font-display font-semibold text-xs text-white/50 uppercase tracking-wider">{modIdx + 1}. {mod.title}</p>
-                </div>
-                {mod.lessons.map((lesson, i) => {
-                  const active = lesson.id === params.lessonId
-                  return (
-                    <Link key={lesson.id} href={`/learn/${params.courseId}/${lesson.id}`}>
-                      <div className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${active ? 'bg-primary/20' : 'hover:bg-white/5'}`}>
-                        <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${active ? 'bg-white/20' : 'bg-white/10'}`}>
-                          <span className="font-body text-[10px] text-white/50">{i+1}</span>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className={`font-body text-xs leading-snug ${active ? 'text-white font-medium' : 'text-white/70'}`}>{lesson.title}</p>
-                          {lesson.duration && <p className="font-body text-[10px] text-white/30 mt-0.5">{lesson.duration} min</p>}
-                        </div>
-                        {active && <span className="material-symbols-outlined text-primary text-sm">play_arrow</span>}
-                      </div>
-                    </Link>
-                  )
-                })}
-              </div>
-            ))}
-          </div>
+          <div
+            className="fixed inset-0 bg-black/60 z-20 md:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
         )}
+
+        {/* Sidebar */}
+        <div
+          className={[
+            'bg-[#141414] flex flex-col overflow-y-auto border-l border-white/10',
+            'fixed top-0 right-0 h-full w-[85vw] max-w-xs z-30 transition-transform duration-300 ease-in-out md:static md:translate-x-0 md:w-80 md:flex-shrink-0 md:z-auto md:h-auto',
+            sidebarOpen ? 'translate-x-0' : 'translate-x-full md:translate-x-0',
+            !sidebarOpen ? 'hidden md:flex md:flex-col' : 'flex flex-col',
+          ].join(' ')}
+        >
+          <div className="p-4 border-b border-white/10 flex items-center justify-between flex-shrink-0">
+            <p className="font-display font-semibold text-white text-sm">Contenido del curso</p>
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="md:hidden p-1 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors"
+            >
+              <span className="material-symbols-outlined text-base">close</span>
+            </button>
+          </div>
+
+          {modules.map((mod, modIdx) => (
+            <div key={mod.id}>
+              <div className="px-4 py-3 bg-white/5">
+                <p className="font-display font-semibold text-xs text-white/50 uppercase tracking-wider">
+                  {modIdx + 1}. {mod.title}
+                </p>
+              </div>
+              {mod.lessons.map((lesson, i) => {
+                const active = lesson.id === params.lessonId
+                return (
+                  <Link key={lesson.id} href={`/learn/${params.courseId}/${lesson.id}`}>
+                    <div className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${active ? 'bg-primary/20' : 'hover:bg-white/5'}`}>
+                      <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${active ? 'bg-white/20' : 'bg-white/10'}`}>
+                        <span className="font-body text-[10px] text-white/50">{i + 1}</span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className={`font-body text-xs leading-snug ${active ? 'text-white font-medium' : 'text-white/70'}`}>
+                          {lesson.title}
+                        </p>
+                        {lesson.duration && (
+                          <p className="font-body text-[10px] text-white/30 mt-0.5">{lesson.duration} min</p>
+                        )}
+                      </div>
+                      {active && <span className="material-symbols-outlined text-primary text-sm">play_arrow</span>}
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )
